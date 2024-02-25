@@ -4,6 +4,10 @@ import os #For file checking
 # For visualiztion purposes
 import matplotlib.pyplot as plt
 import numpy as np
+import tkinter as tk
+
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Class representing a cell in Game of Life, can be alive or dead, has cooordinates
 class Cell:
@@ -38,9 +42,10 @@ def create_universe(width: int, height: int, active_cells : list[tuple[int, int]
         universe.change_cell(cell)
     return universe
 
-def plot_universe(universe, grid : bool = True):
+def plot_universe(universe, grid : bool = True) -> Figure:
+    fig = Figure(figsize=(6,4))
     # Create a new figure and axes
-    fig, ax = plt.subplots()
+    ax = fig.add_subplot(111)
 
     # Convert the universe's cell states to a numpy array for efficient plotting
     cell_states = np.array([[cell.state for cell in row] for row in universe.cells])
@@ -58,9 +63,10 @@ def plot_universe(universe, grid : bool = True):
 
     # Set title and show the plot
     ax.set_title("Game of Life")
-    plt.show()
+    return fig
 
 universe = None
+generation = 1
 _generations = 0
 
 # This program needs a file as parameter, only the file name is needed, not the folder
@@ -93,4 +99,30 @@ if __name__ == "__main__":
             print(".in file not found. Please check file name.")
             exit()
 
-plot_universe(universe)
+# TKinter button function
+def next_generation_button_click():
+    # GOL variables
+    global universe
+    global generation
+    global _generations
+    
+    # TK widgets
+    global text
+    global canvas
+    
+    #TODO update universe
+    #plot_universe(universe)
+    generation = generation + 1
+    text.delete("1.0", "2.0")
+    text.insert("1.0", f"Generation {generation} of {_generations}")
+
+window = tk.Tk()
+text = tk.Text(window)
+text.insert("1.0", f"Generation {generation} of {_generations}")
+canvas = FigureCanvasTkAgg(plot_universe(universe), window)
+button = tk.Button(window, text=f"Next Generation", command=next_generation_button_click)
+text.pack()
+canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+button.pack()
+
+window.mainloop()
