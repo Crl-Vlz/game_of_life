@@ -1,6 +1,10 @@
 import sys #For parameters
 import os #For file checking
 
+# For visualiztion purposes
+import matplotlib.pyplot as plt
+import numpy as np
+
 # Class representing a cell in Game of Life, can be alive or dead, has cooordinates
 class Cell:
     def __init__(self, coord_x : int, coord_y : int):
@@ -33,6 +37,28 @@ def create_universe(width: int, height: int, active_cells : list[tuple[int, int]
     for cell in active_cells:
         universe.change_cell(cell)
     return universe
+
+def plot_universe(universe, grid : bool = True):
+    # Create a new figure and axes
+    fig, ax = plt.subplots()
+
+    # Convert the universe's cell states to a numpy array for efficient plotting
+    cell_states = np.array([[cell.state for cell in row] for row in universe.cells])
+
+    # Create the plot using Matplotlib's imshow function
+    ax.imshow(cell_states, cmap="binary", aspect="auto")  # "binary" colors cells as "X" (black) and "O" (white)
+
+    # Show grid
+    if grid:
+        num_rows, num_cols = cell_states.shape
+        for x in np.arange(-0.5, num_cols + 0.5):  # Include left and right edges for visual clarity
+            ax.axvline(x, color='lightgray', linestyle='--', linewidth=0.8)
+        for y in np.arange(-0.5, num_rows + 0.5):  # Include top and bottom edges
+            ax.axhline(y, color='lightgray', linestyle='--', linewidth=0.8)
+
+    # Set title and show the plot
+    ax.set_title("Game of Life")
+    plt.show()
 
 universe = None
 _generations = 0
@@ -67,4 +93,4 @@ if __name__ == "__main__":
             print(".in file not found. Please check file name.")
             exit()
 
-print(universe)
+plot_universe(universe)
