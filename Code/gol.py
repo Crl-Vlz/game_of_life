@@ -42,10 +42,11 @@ def create_universe(width: int, height: int, active_cells : list[tuple[int, int]
         universe.change_cell(cell)
     return universe
 
-def plot_universe(universe, grid : bool = True) -> Figure:
-    fig = Figure(figsize=(6,4))
+fig = Figure(figsize=(6,4))
+ax = fig.add_subplot(111)
+def plot_universe(universe, grid : bool = True) -> None:
+    ax.cla()
     # Create a new figure and axes
-    ax = fig.add_subplot(111)
 
     # Convert the universe's cell states to a numpy array for efficient plotting
     cell_states = np.array([[cell.state for cell in row] for row in universe.cells])
@@ -63,7 +64,6 @@ def plot_universe(universe, grid : bool = True) -> Figure:
 
     # Set title and show the plot
     ax.set_title("Game of Life")
-    return fig
 
 universe = None
 generation = 1
@@ -99,6 +99,12 @@ if __name__ == "__main__":
             print(".in file not found. Please check file name.")
             exit()
 
+window = tk.Tk()
+text = tk.Text(window)
+text.insert("1.0", f"Generation {generation} of {_generations}")
+plot_universe(universe)
+canvas = FigureCanvasTkAgg(fig, window)
+
 # TKinter button function
 def next_generation_button_click():
     # GOL variables
@@ -111,15 +117,13 @@ def next_generation_button_click():
     global canvas
     
     #TODO update universe
-    #plot_universe(universe)
+    plot_universe(universe)
+    canvas.draw()
     generation = generation + 1
     text.delete("1.0", "2.0")
     text.insert("1.0", f"Generation {generation} of {_generations}")
 
-window = tk.Tk()
-text = tk.Text(window)
-text.insert("1.0", f"Generation {generation} of {_generations}")
-canvas = FigureCanvasTkAgg(plot_universe(universe), window)
+
 button = tk.Button(window, text=f"Next Generation", command=next_generation_button_click)
 text.pack()
 canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
