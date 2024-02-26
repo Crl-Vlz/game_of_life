@@ -26,7 +26,7 @@ class Universe:
     def __init__(self, width: int, height: int):
         self.width = width
         self.height = height
-        self.cells = [[Cell(j, i) for i in range(height)] for j in range(width)]
+        self.cells = [[Cell(i, j) for i in range(width)] for j in range(height)]
     def __repr__(self) -> str:
         string = ""
         for row in self.cells:
@@ -35,7 +35,7 @@ class Universe:
             string = string + "\n"
         return string
     def change_cell(self, cell : tuple[int, int]): # Toggles state of a specific cell
-        self.cells[cell[0]][cell[1]].change_state()
+        self.cells[cell[1]][cell[0]].change_state()
     def update_universe(self) -> None: # Applies rules of Conway's game of life to the universe
         for row in self.cells:
             for cell in row:
@@ -43,21 +43,23 @@ class Universe:
                 # 8 neighbors
                 # A neighbor is counted as an active cell
                 if cell.x > 0: #Don't check left if first element
-                    if self.cells[cell.x - 1][cell.y].state: neighbors = neighbors + 1
+                    if self.cells[cell.y][cell.x - 1].state: neighbors = neighbors + 1
                     if cell.y > 0: #Don't check up if first element
-                        if self.cells[cell.x - 1][cell.y - 1].state: neighbors = neighbors + 1
+                        if self.cells[cell.y - 1][cell.x - 1].state: neighbors = neighbors + 1
                     if cell.y + 1 < self.height: #Don't check down if last element
-                        if self.cells[cell.x - 1][cell.y + 1].state: neighbors = neighbors + 1
+                        if self.cells[cell.y + 1][cell.x - 1].state: neighbors = neighbors + 1
                 if cell.y > 0: #Don't check up if first element
-                    if self.cells[cell.x][cell.y - 1].state: neighbors = neighbors + 1
+                    if self.cells[cell.y - 1][cell.x].state: neighbors = neighbors + 1
                 if cell.y + 1 < self.height: #Don't check down if last element
-                    if self.cells[cell.x][cell.y + 1].state: neighbors = neighbors + 1
+                    if self.cells[cell.y + 1][cell.x].state: neighbors = neighbors + 1
                 if cell.x + 1 < self.width: #Don't check left if first element
-                    if self.cells[cell.x + 1][cell.y].state: neighbors = neighbors + 1
+                    if self.cells[cell.y][cell.x + 1].state: neighbors = neighbors + 1
                     if cell.y > 0: #Don't check up if first element
-                        if self.cells[cell.x + 1][cell.y - 1].state: neighbors = neighbors + 1
+                        if self.cells[cell.y - 1][cell.x + 1].state: neighbors = neighbors + 1
                     if cell.y + 1 < self.height: #Don't check down if last element
-                        if self.cells[cell.x + 1][cell.y + 1].state: neighbors = neighbors + 1
+                        if self.cells[cell.y + 1][cell.x + 1].state: neighbors = neighbors + 1
+                if neighbors > 0:
+                    print(f"{cell.x},{cell.y} has {neighbors} neighbors")
                 if cell.state:
                     if neighbors <= 1:
                         cell.change_state()
@@ -75,7 +77,7 @@ def create_universe(width: int, height: int, active_cells : list[tuple[int, int]
         universe.change_cell(cell)
     return universe
 
-fig = Figure(figsize=(6,4))
+fig = Figure(figsize=(4,4))
 ax = fig.add_subplot(111)
 def plot_universe(universe, grid : bool = True) -> None:
     ax.cla()
@@ -126,7 +128,7 @@ if __name__ == "__main__":
             _width, _height = map(int, lines[0].split())
             _generations = int(lines[1])
             _active_cells = []
-            _active_cells.extend(tuple(list(int(x) for x in line.split()).__reversed__()) for line in lines[2:])
+            _active_cells.extend(tuple(list(int(x) for x in line.split())) for line in lines[2:])
             universe = create_universe(_width, _height, _active_cells)
         else:
             print(".in file not found. Please check file name.")
@@ -159,6 +161,7 @@ def next_generation_button_click():
 
 
 button = tk.Button(window, text=f"Next Generation", command=next_generation_button_click)
+text.config(height=1)
 text.pack()
 canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 button.pack()
