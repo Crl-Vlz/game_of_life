@@ -15,6 +15,7 @@ class Cell:
         self.x : int = coord_x
         self.y : int = coord_y
         self.state : bool = False
+        self.neighbors : int = 0
     def change_state(self):
         self.state = not self.state
     def __repr__(self) -> str:
@@ -37,6 +38,8 @@ class Universe:
     def change_cell(self, cell : tuple[int, int]): # Toggles state of a specific cell
         self.cells[cell[1]][cell[0]].change_state()
     def update_universe(self) -> None: # Applies rules of Conway's game of life to the universe
+        #TODO change to store number of neighbors, and then change state
+        # By changing state before we screw up the rules
         for row in self.cells:
             for cell in row:
                 neighbors = 0
@@ -52,21 +55,23 @@ class Universe:
                     if self.cells[cell.y - 1][cell.x].state: neighbors = neighbors + 1
                 if cell.y + 1 < self.height: #Don't check down if last element
                     if self.cells[cell.y + 1][cell.x].state: neighbors = neighbors + 1
-                if cell.x + 1 < self.width: #Don't check left if first element
+                if cell.x + 1 < self.width: #Don't check right if last element
                     if self.cells[cell.y][cell.x + 1].state: neighbors = neighbors + 1
                     if cell.y > 0: #Don't check up if first element
                         if self.cells[cell.y - 1][cell.x + 1].state: neighbors = neighbors + 1
                     if cell.y + 1 < self.height: #Don't check down if last element
                         if self.cells[cell.y + 1][cell.x + 1].state: neighbors = neighbors + 1
-                if neighbors > 0:
-                    print(f"{cell.x},{cell.y} has {neighbors} neighbors")
+                cell.neighbors = neighbors
+        # Two for loops, one to check neighbors, one to change states
+        for row in self.cells:
+            for cell in row:
                 if cell.state:
-                    if neighbors <= 1:
+                    if cell.neighbors <= 1:
                         cell.change_state()
-                    elif neighbors >= 4:
+                    elif cell.neighbors >= 4:
                         cell.change_state()
                 else:
-                    if neighbors == 3:
+                    if cell.neighbors == 3:
                         cell.change_state()
                 
 
@@ -87,7 +92,7 @@ def plot_universe(universe, grid : bool = True) -> None:
     cell_states = np.array([[cell.state for cell in row] for row in universe.cells])
 
     # Create the plot using Matplotlib's imshow function
-    ax.imshow(cell_states, cmap="binary", aspect="auto")  # "binary" colors cells as "X" (black) and "O" (white)
+    ax.imshow(cell_states, cmap="binary", aspect="equal")  # "binary" colors cells as "X" (black) and "O" (white)
 
     # Show grid
     if grid:
@@ -151,7 +156,6 @@ def next_generation_button_click():
     global text
     global canvas
     
-    #TODO update universe
     universe.update_universe()
     plot_universe(universe)
     canvas.draw()
