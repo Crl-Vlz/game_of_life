@@ -8,6 +8,7 @@ import tkinter as tk
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends._backend_tk import NavigationToolbar2Tk as Navbar
 
 # Class representing a cell in Game of Life, can be alive or dead, has cooordinates
 class Cell:
@@ -82,7 +83,7 @@ def create_universe(width: int, height: int, active_cells : list[tuple[int, int]
         universe.change_cell(cell)
     return universe
 
-fig = Figure(figsize=(4,4))
+fig = Figure(figsize=(8,6))
 ax = fig.add_subplot(111)
 def plot_universe(universe, grid : bool = True) -> None:
     ax.cla()
@@ -144,6 +145,8 @@ text = tk.Text(window)
 text.insert("1.0", f"Generation {generation} of {_generations}")
 plot_universe(universe)
 canvas = FigureCanvasTkAgg(fig, window)
+toolbar = Navbar(canvas, window)
+toolbar.update()
 
 # TKinter button function
 def next_generation_button_click():
