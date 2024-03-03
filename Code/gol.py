@@ -85,7 +85,19 @@ def create_universe(width: int, height: int, active_cells : list[tuple[int, int]
 
 fig = Figure(figsize=(8,6))
 ax = fig.add_subplot(111)
-def plot_universe(universe, grid : bool = True) -> None:
+
+def center_view(universe) -> tuple:
+    x_coords = []
+    y_coords = []
+    for row in universe.cells:
+        for cell in row:
+            if cell.state:
+                x_coords.append(cell.x)
+                y_coords.append(cell.y)
+    
+    return (min(x_coords), max(x_coords), min(y_coords), max(y_coords))
+
+def plot_universe(universe, padding: int, grid : bool = True) -> None:
     ax.cla()
     # Create a new figure and axes
 
@@ -103,6 +115,25 @@ def plot_universe(universe, grid : bool = True) -> None:
         for y in np.arange(-0.5, num_rows + 0.5):  # Include top and bottom edges
             ax.axhline(y, color='lightgray', linestyle='--', linewidth=0.8)
 
+    # Calculates the coordinates of the cells at the border
+    limits = center_view(universe)
+
+    min_x = 0
+    min_y = 0
+    max_x = 0
+    max_y = 0
+
+    if limits[0] >= padding: min_x =  limits[0] - padding
+    else: min_x = 0
+    if limits[1] <= universe.width - padding: max_x =  limits[1] + padding
+    else: max_x = universe.width
+    if limits[2] >= padding: min_y =  limits[2] - padding
+    else: min_y = 0
+    if limits[3] <= universe.width - padding: max_y =  limits[3] + padding
+    else: max_y = universe.width
+
+    ax.set_xlim(round(min_x), round(max_x)) # zoom plot view to the region where cells exist
+    ax.set_ylim(round(min_y), round(max_y))
     # Set title and show the plot
     ax.set_title("Game of Life")
 
@@ -143,7 +174,10 @@ if __name__ == "__main__":
 window = tk.Tk()
 text = tk.Text(window)
 text.insert("1.0", f"Generation {generation} of {_generations}")
-plot_universe(universe)
+
+padding = 10     # the distance between the border cell and the visible plot ----------------------------------------------------------------
+
+plot_universe(universe, padding)
 canvas = FigureCanvasTkAgg(fig, window)
 toolbar = Navbar(canvas, window)
 toolbar.update()
@@ -160,7 +194,7 @@ def next_generation_button_click():
     global canvas
     
     universe.update_universe()
-    plot_universe(universe)
+    plot_universe(universe, padding)
     canvas.draw()
     generation = generation + 1
     text.delete("1.0", "2.0")
