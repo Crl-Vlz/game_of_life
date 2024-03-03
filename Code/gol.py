@@ -1,5 +1,7 @@
 import sys #For parameters
 import os #For file checking
+import time # for sleep when you run all generations
+import threading # for stopping the all generatios running
 
 # For visualiztion purposes
 import matplotlib.pyplot as plt
@@ -94,8 +96,11 @@ def center_view(universe) -> tuple:
             if cell.state:
                 x_coords.append(cell.x)
                 y_coords.append(cell.y)
+
+    if len(x_coords) > 0 and len(y_coords) > 0:
+        return (min(x_coords), max(x_coords), min(y_coords), max(y_coords))
     
-    return (min(x_coords), max(x_coords), min(y_coords), max(y_coords))
+    return (0,0,0,0)
 
 def plot_universe(universe, padding: int, grid : bool = True) -> None:
     ax.cla()
@@ -175,7 +180,7 @@ window = tk.Tk()
 text = tk.Text(window)
 text.insert("1.0", f"Generation {generation} of {_generations}")
 
-padding = 10     # the distance between the border cell and the visible plot ----------------------------------------------------------------
+padding = 15     # the distance between the border cell and the visible plot ----------------------------------------------------------------
 
 plot_universe(universe, padding)
 canvas = FigureCanvasTkAgg(fig, window)
@@ -183,7 +188,7 @@ toolbar = Navbar(canvas, window)
 toolbar.update()
 
 # TKinter button function
-def next_generation_button_click():
+def one_generation_button_click() -> None:
     # GOL variables
     global universe
     global generation
@@ -199,12 +204,33 @@ def next_generation_button_click():
     generation = generation + 1
     text.delete("1.0", "2.0")
     text.insert("1.0", f"Generation {generation} of {_generations}")
+    window.update()
 
+def all_generations_button_click():
+    global all_gen_loop 
+    all_gen_loop = True
+    for gen in range(generation, _generations - 1):
+        if not all_gen_loop: break
+        one_generation_button_click()
+        time.sleep(.1)
 
-button = tk.Button(window, text=f"Next Generation", command=next_generation_button_click)
+def stop_button_click():
+    global all_gen_loop
+    all_gen_loop = False
+    if all_gen_loop:
+        loop_thread = threading.Thread(target=all_generations_button_click)
+        loop_thread.start()
+
+all_gen_loop = False
+
+button_one_gen = tk.Button(window, text=f"Run NEXT Generation", command=one_generation_button_click)
+button_all_gens = tk.Button(window, text=f"Run ALL Generations", command=all_generations_button_click)
+button_stop = tk.Button(window, text=f"STOP All Gen Loop", command=stop_button_click)
 text.config(height=1)
 text.pack()
 canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-button.pack()
+button_one_gen.pack()
+button_all_gens.pack()
+button_stop.pack()
 
 window.mainloop()
