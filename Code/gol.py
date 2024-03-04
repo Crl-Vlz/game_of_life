@@ -274,17 +274,17 @@ def center_view(universe) -> tuple:
 def generate_output(patterns) -> None:
     mode = 'a'
     first_lines = ''
-    percentilePatterns = patterns
+    percentilePatterns = dict()
     if generation == 1:
         mode = 'w'
         first_lines = f"Simulation at { datetime.datetime.now().date()}\nUniverse Size: {universe.width} x {universe.height}\n\n"
     total = patterns['Total']
     for key in patterns:
-        percentilePatterns[key] = round((percentilePatterns[key]/total)*100)
+        percentilePatterns[key] = round((patterns[key]/total)*100)
         patterns[key] = f" {str(patterns[key])}"
         patterns[key] += ' ' * (7 - len(patterns[key]))
         percentilePatterns[key] = f" {str(percentilePatterns[key])}"
-        percentilePatterns[key] += ' ' * (7 - len(percentilePatterns[key]))
+        percentilePatterns[key] += ' ' * (9 - len(percentilePatterns[key]))
     
 
     with open("output.txt", mode, encoding="utf-8") as output:
