@@ -280,7 +280,8 @@ def generate_output(patterns) -> None:
         first_lines = f"Simulation at { datetime.datetime.now().date()}\nUniverse Size: {universe.width} x {universe.height}\n\n"
     total = patterns['Total']
     for key in patterns:
-        percentilePatterns[key] = round((patterns[key]/total)*100)
+        if total == 0: percentilePatterns[key] = 0
+        else: percentilePatterns[key] = round((patterns[key]/total)*100)
         patterns[key] = f" {str(patterns[key])}"
         patterns[key] += ' ' * (7 - len(patterns[key]))
         percentilePatterns[key] = f" {str(percentilePatterns[key])}"
@@ -329,8 +330,6 @@ def plot_universe(universe, padding: int, grid : bool = True) -> None:
 
     patterns = countPatterns(cell_states, limits) # count the patterns at every generation
     generate_output(patterns)
-
-    print(generation, ": ", patterns)
 
     min_x, min_y, max_x, max_y = 0, 0, universe.width, universe.height
 
@@ -434,11 +433,15 @@ def stop_button_click():
         loop_thread = threading.Thread(target=all_generations_button_click)
         loop_thread.start()
 
+def close_button_click():
+    exit()
+
 all_gen_loop = False
 
 button_one_gen = tk.Button(window, text=f"Run NEXT Generation", command=one_generation_button_click)
 button_all_gens = tk.Button(window, text=f"Run ALL Generations", command=all_generations_button_click)
 button_stop = tk.Button(window, text=f"STOP All Gen Loop", command=stop_button_click)
+button_close = tk.Button(window, text=f"CLOSE", command=close_button_click)
 button_stop.configure(state="disabled")
 text.config(height=1)
 text.pack()
@@ -446,5 +449,6 @@ canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 button_one_gen.pack()
 button_all_gens.pack()
 button_stop.pack()
+button_close.pack()
 
 window.mainloop()
