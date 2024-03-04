@@ -13,6 +13,8 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends._backend_tk import NavigationToolbar2Tk as Navbar
 
+#AUTHORS: Carlos Vélez, Miguel Tovar, Andrés Martínez
+
 # Class representing a cell in Game of Life, can be alive or dead, has cooordinates
 class Cell:
     def __init__(self, coord_x : int, coord_y : int):
@@ -76,7 +78,8 @@ class Universe:
                         cell.change_state()
                 else:
                     if cell.neighbors == 3:
-                        cell.change_state()
+                        if (cell.x > 1 and cell.y > 1) and (cell.x < self.width and cell.y < self.height):
+                            cell.change_state()
 
  #Figures
 block=np.array([[False,False,False,False],#4x4
@@ -187,61 +190,188 @@ def countPatterns(universe, limits) -> dict:
 
     for i in range(min_x, max_x):
         for j in range(min_y, max_y):
+            #BLOCK
             if i+4 <= max_x+2 and j+4 <= max_y+2 and (universe[i:i+4, j:j+4] == block).all(): 
                 patternCounter["Block"] += 1
                 patternCounter["Total"] += 1
+            #BEEHIVE
             elif i+5 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+5, j:j+6] == beehive).all():
                 patternCounter["Beehive"] += 1
                 patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+6, j:j+5] == np.rot90(beehive, k=1)).all():
+                patternCounter["Beehive"] += 1
+                patternCounter["Total"] += 1
+            #LOAF
             elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == loaf).all():
                 patternCounter["Loaf"] += 1
                 patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == np.rot90(loaf, k=1)).all():
+                patternCounter["Loaf"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == np.rot90(loaf, k=2)).all():
+                patternCounter["Loaf"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == np.rot90(loaf, k=3)).all():
+                patternCounter["Loaf"] += 1
+                patternCounter["Total"] += 1
+            #BOAT
             elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == boat).all():
                 patternCounter["Boat"] += 1
                 patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(boat, k=1)).all():
+                patternCounter["Boat"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(boat, k=2)).all():
+                patternCounter["Boat"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(boat, k=3)).all():
+                patternCounter["Boat"] += 1
+                patternCounter["Total"] += 1
+            #TUB
             elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == tub).all():
                 patternCounter["Tub"] += 1
                 patternCounter["Total"] += 1
+            #BLINKER
             elif i+5 <= max_x+2 and j+3 <= max_y+2 and (universe[i:i+5,j:j+3] == blinker[0]).all():
                 patternCounter["Blinker"] += 1
                 patternCounter["Total"] += 1
             elif i+3 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+3, j:j+5] == blinker[1]).all():
                 patternCounter["Blinker"] += 1
                 patternCounter["Total"] += 1
+            #TOAD
             elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == toad[0]).all():
+                patternCounter["Toad"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == np.rot90(toad[0], k=1)).all():
+                patternCounter["Toad"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == toad[0][:, ::-1]).all():
+                patternCounter["Toad"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == np.rot90(toad[0][:, ::-1], k=1)).all():
                 patternCounter["Toad"] += 1
                 patternCounter["Total"] += 1
             elif i+4 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+4, j:j+6] == toad[1]).all():
                 patternCounter["Toad"] += 1
                 patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+4 <= max_y+2 and (universe[i:i+6, j:j+4] == np.rot90(toad[1], k=1)).all():
+                patternCounter["Toad"] += 1
+                patternCounter["Total"] += 1
+            elif i+4 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+4, j:j+6] == toad[1][:, ::-1]).all():
+                patternCounter["Toad"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+4 <= max_y+2 and (universe[i:i+6, j:j+4] == np.rot90(toad[1][:, ::-1], k=1)).all():
+                patternCounter["Toad"] += 1
+                patternCounter["Total"] += 1
+            #BEACON
             elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == beacon[0]).all():
+                patternCounter["Beacon"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == np.rot90(beacon[0], k=1)).all():
                 patternCounter["Beacon"] += 1
                 patternCounter["Total"] += 1
             elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == beacon[1]).all():
                 patternCounter["Beacon"] += 1
                 patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == np.rot90(beacon[1], k=1)).all():
+                patternCounter["Beacon"] += 1
+                patternCounter["Total"] += 1
+            #GLIDER
             elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == glider[0]).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[0], k=1)).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[0], k=2)).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[0], k=3)).all():
                 patternCounter["Glider"] += 1
                 patternCounter["Total"] += 1
             elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == glider[1]).all():
                 patternCounter["Glider"] += 1
                 patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[1], k=1)).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[1], k=2)).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[1], k=3)).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
             elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == glider[2]).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[2], k=1)).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[2], k=2)).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[2], k=3)).all():
                 patternCounter["Glider"] += 1
                 patternCounter["Total"] += 1
             elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == glider[3]).all():
                 patternCounter["Glider"] += 1
                 patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[3], k=1)).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[3], k=2)).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == np.rot90(glider[3], k=3)).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            #SPACESHIP
             elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == spaceship[0]).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+7 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+7, j:j+6] == np.rot90(spaceship[0], k=1)).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == np.rot90(spaceship[0], k=2)).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+7 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+7, j:j+6] == np.rot90(spaceship[0], k=3)).all():
                 patternCounter["Lg Spship"] += 1
                 patternCounter["Total"] += 1
             elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == spaceship[1]).all():
                 patternCounter["Lg Spship"] += 1
                 patternCounter["Total"] += 1
+            elif i+7 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+7, j:j+6] == np.rot90(spaceship[1], k=1)).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == np.rot90(spaceship[1], k=2)).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+7 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+7, j:j+6] == np.rot90(spaceship[1], k=3)).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
             elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == spaceship[2]).all():
                 patternCounter["Lg Spship"] += 1
                 patternCounter["Total"] += 1
+            elif i+7 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+7, j:j+6] == np.rot90(spaceship[2], k=1)).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == np.rot90(spaceship[2], k=2)).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+7 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+7, j:j+6] == np.rot90(spaceship[2], k=3)).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
             elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == spaceship[3]).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+7 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+7, j:j+6] == np.rot90(spaceship[3], k=1)).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == np.rot90(spaceship[3], k=2)).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+7 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+7, j:j+6] == np.rot90(spaceship[3], k=3)).all():
                 patternCounter["Lg Spship"] += 1
                 patternCounter["Total"] += 1
     return patternCounter
