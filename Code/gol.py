@@ -2,6 +2,7 @@ import sys #For parameters
 import os #For file checking
 import time # for sleep when you run all generations
 import threading # for stopping the all generatios running
+import datetime #to print the date of the running at the output
 
 # For visualiztion purposes
 import matplotlib.pyplot as plt
@@ -76,11 +77,179 @@ class Universe:
                 else:
                     if cell.neighbors == 3:
                         cell.change_state()
-                
+
+ #Figures
+block=np.array([[False,False,False,False],#4x4
+                [False,True,True,False],
+                [False,True,True,False],
+                [False,False,False,False]])
+beehive=np.array([[False,False,False,False,False,False],#6x5
+                [False,False,True,True,False,False],
+                [False,True,False,False,True,False],
+                [False,False,True,True,False,False],
+                [False,False,False,False,False,False]])
+loaf=np.array([[False,False,False,False,False,False],#6x6
+                [False,False,True,True,False,False],
+                [False,True,False,False,True,False],
+                [False,False,True,False,True,False],
+                [False,False,False,True,False,False],
+                [False,False,False,False,False,False]])
+boat=np.array([[False,False,False,False,False],#5x5
+                [False,True,True,False,False],
+                [False,True,False,True,False],
+                [False,False,True,False,False],
+                [False,False,False,False,False]])
+tub=np.array([[False,False,False,False,False],#5x5
+                [False,False,True,False,False],
+                [False,True,False,True,False],
+                [False,False,True,False,False],
+                [False,False,False,False,False]])
+blinker=[np.array([[False,False,False],#3x5and5x3
+                    [False,True,False],
+                    [False,True,False],
+                    [False,True,False],
+                    [False,False,False]]),
+        np.array([[False,False,False,False,False],
+                    [False,True,True,True,False],
+                    [False,False,False,False,False]])]
+toad=[np.array([[False,False,False,False,False,False],#6x6and6x4
+                [False,False,False,True,False,False],
+                [False,True,False,False,True,False],
+                [False,True,False,False,True,False],
+                [False,False,True,False,False,False],
+                [False,False,False,False,False,False]]),
+        np.array([[False,False,False,False,False,False],
+                [False,False,True,True,True,False],
+                [False,True,True,True,False,False],
+                [False,False,False,False,False,False]])]
+beacon=[np.array([[False,False,False,False,False,False],#6x6and6x6
+                [False,True,True,False,False,False],
+                [False,True,True,False,False,False],
+                [False,False,False,True,True,False],
+                [False,False,False,True,True,False],
+                [False,False,False,False,False,False]]),
+        np.array([[False,False,False,False,False,False],
+                [False,True,True,False,False,False],
+                [False,True,False,False,False,False],
+                [False,False,False,False,True,False],
+                [False,False,False,True,True,False],
+                [False,False,False,False,False,False]])]
+glider=[np.array([[False,False,False,False,False],#5x5,5x5,5x5and5x5
+                [False,False,True,False,False],
+                [False,False,False,True,False],
+                [False,True,True,True,False],
+                [False,False,False,False,False]]),
+        np.array([[False,False,False,False,False],
+                [False,True,False,True,False],
+                [False,False,True,True,False],
+                [False,False,True,False,False],
+                [False,False,False,False,False]]),
+        np.array([[False,False,False,False,False],
+                [False,False,False,True,False],
+                [False,True,False,True,False],
+                [False,False,True,True,False],
+                [False,False,False,False,False]]),
+        np.array([[False,False,False,False,False],
+                [False,True,False,False,False],
+                [False,False,True,True,False],
+                [False,True,True,False,False],
+                [False,False,False,False,False]])]
+spaceship=[np.array([[False,False,False,False,False,False,False],#7x6,7x6,7x6and7x6
+                [False,True,False,False,True,False,False],
+                [False,False,False,False,False,True,False],
+                [False,True,False,False,False,True,False],
+                [False,False,True,True,True,True,False],
+                [False,False,False,False,False,False,False]]),
+        np.array([[False,False,False,False,False,False,False],
+                [False,False,False,True,True,False,False],
+                [False,True,True,False,True,True,False],
+                [False,True,True,True,True,False,False],
+                [False,False,True,True,False,False,False],
+                [False,False,False,False,False,False,False]]),
+        np.array([[False,False,False,False,False,False,False],
+                [False,False,True,True,True,True,False],
+                [False,True,False,False,False,True,False],
+                [False,False,False,False,False,True,False],
+                [False,True,False,False,True,False,False],
+                [False,False,False,False,False,False,False]]),
+        np.array([[False,False,False,False,False,False,False],
+                [False,False,True,True,False,False,False],
+                [False,True,True,True,True,False,False],
+                [False,True,True,False,True,True,False],
+                [False,False,False,True,True,False,False],
+                [False,False,False,False,False,False,False]])]
+
+def countPatterns(universe, limits) -> dict:
+    # limits are the exact coordinate, so here we add one cell more to each side, to match with the figures pattern
+    min_x, max_x, min_y, max_y = limits[0]-1, limits[1]+1, limits[2]-1, limits[3]+1
+    patternCounter = {'Block': 0,'Beehive': 0,'Loaf': 0,'Boat': 0,'Tub': 0,'Blinker': 0,'Toad': 0,
+                      'Beacon': 0,'Glider': 0,'Lg Spship': 0, 'Total': 0}
+
+    for i in range(min_x, max_x):
+        for j in range(min_y, max_y):
+            if i+4 <= max_x+2 and j+4 <= max_y+2 and (universe[i:i+4, j:j+4] == block).all(): 
+                patternCounter["Block"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+5, j:j+6] == beehive).all():
+                patternCounter["Beehive"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == loaf).all():
+                patternCounter["Loaf"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == boat).all():
+                patternCounter["Boat"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == tub).all():
+                patternCounter["Tub"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+3 <= max_y+2 and (universe[i:i+5,j:j+3] == blinker[0]).all():
+                patternCounter["Blinker"] += 1
+                patternCounter["Total"] += 1
+            elif i+3 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+3, j:j+5] == blinker[1]).all():
+                patternCounter["Blinker"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == toad[0]).all():
+                patternCounter["Toad"] += 1
+                patternCounter["Total"] += 1
+            elif i+4 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+4, j:j+6] == toad[1]).all():
+                patternCounter["Toad"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == beacon[0]).all():
+                patternCounter["Beacon"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+6 <= max_y+2 and (universe[i:i+6, j:j+6] == beacon[1]).all():
+                patternCounter["Beacon"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == glider[0]).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == glider[1]).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == glider[2]).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+5 <= max_x+2 and j+5 <= max_y+2 and (universe[i:i+5, j:j+5] == glider[3]).all():
+                patternCounter["Glider"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == spaceship[0]).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == spaceship[1]).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == spaceship[2]).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+            elif i+6 <= max_x+2 and j+7 <= max_y+2 and (universe[i:i+6, j:j+7] == spaceship[3]).all():
+                patternCounter["Lg Spship"] += 1
+                patternCounter["Total"] += 1
+    return patternCounter
 
 # Creates a Universe, and activates 0 or more cells
 def create_universe(width: int, height: int, active_cells : list[tuple[int, int]]) -> Universe:
-    universe = Universe(width, height)
+    # one row above and one below, same with columns, to add a padding and keep safe the area to check patterns
+    universe = Universe(width+2, height+2) 
     for cell in active_cells:
         universe.change_cell(cell)
     return universe
@@ -101,6 +270,41 @@ def center_view(universe) -> tuple:
         return (min(x_coords), max(x_coords), min(y_coords), max(y_coords))
     
     return (0,0,0,0)
+
+def generate_output(patterns) -> None:
+    mode = 'a'
+    first_lines = ''
+    percentilePatterns = patterns
+    if generation == 1:
+        mode = 'w'
+        first_lines = f"Simulation at { datetime.datetime.now().date()}\nUniverse Size: {universe.width} x {universe.height}\n\n"
+    total = patterns['Total']
+    for key in patterns:
+        percentilePatterns[key] = round((percentilePatterns[key]/total)*100)
+        patterns[key] = f" {str(patterns[key])}"
+        patterns[key] += ' ' * (7 - len(patterns[key]))
+        percentilePatterns[key] = f" {str(percentilePatterns[key])}"
+        percentilePatterns[key] += ' ' * (7 - len(percentilePatterns[key]))
+    
+
+    with open("output.txt", mode, encoding="utf-8") as output:
+        output.write(f"{first_lines}Iteration: {generation}\n")
+        output.write("−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n")
+        output.write("|            | Count | Percent |\n")
+        output.write("−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n")
+        output.write(f"|Block       |{patterns['Block']}|{percentilePatterns['Block']}|\n")
+        output.write(f"|Beehive     |{patterns['Beehive']}|{percentilePatterns['Beehive']}|\n")
+        output.write(f"|Loaf        |{patterns['Loaf']}|{percentilePatterns['Loaf']}|\n")
+        output.write(f"|Boat        |{patterns['Boat']}|{percentilePatterns['Boat']}|\n")
+        output.write(f"|Tub         |{patterns['Tub']}|{percentilePatterns['Tub']}|\n")
+        output.write(f"|Blinker     |{patterns['Blinker']}|{percentilePatterns['Blinker']}|\n")
+        output.write(f"|Toad        |{patterns['Toad']}|{percentilePatterns['Toad']}|\n")
+        output.write(f"|Beacon      |{patterns['Beacon']}|{percentilePatterns['Beacon']}|\n")
+        output.write(f"|Glider      |{patterns['Glider']}|{percentilePatterns['Glider']}|\n")
+        output.write(f"Lg Spship    |{patterns['Lg Spship']}|{percentilePatterns['Lg Spship']}|\n")
+        output.write("−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n")
+        output.write(f"TOTAL        |{patterns['Total']}|         |\n")
+        output.write("−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n")
 
 def plot_universe(universe, padding: int, grid : bool = True) -> None:
     ax.cla()
@@ -123,19 +327,18 @@ def plot_universe(universe, padding: int, grid : bool = True) -> None:
     # Calculates the coordinates of the cells at the border
     limits = center_view(universe)
 
-    min_x = 0
-    min_y = 0
-    max_x = 0
-    max_y = 0
+    patterns = countPatterns(cell_states, limits) # count the patterns at every generation
+    generate_output(patterns)
+
+    print(generation, ": ", patterns)
+
+    min_x, min_y, max_x, max_y = 0, 0, universe.width, universe.height
 
     if limits[0] >= padding: min_x =  limits[0] - padding
-    else: min_x = 0
-    if limits[1] <= universe.width - padding: max_x =  limits[1] + padding
-    else: max_x = universe.width
+    if limits[1] <= (universe.width-padding): max_x =  limits[1] + padding
+
     if limits[2] >= padding: min_y =  limits[2] - padding
-    else: min_y = 0
-    if limits[3] <= universe.width - padding: max_y =  limits[3] + padding
-    else: max_y = universe.width
+    if limits[3] <= (universe.height-padding): max_y =  limits[3] + padding
 
     ax.set_xlim(round(min_x), round(max_x)) # zoom plot view to the region where cells exist
     ax.set_ylim(round(min_y), round(max_y))
@@ -170,7 +373,8 @@ if __name__ == "__main__":
             _width, _height = map(int, lines[0].split())
             _generations = int(lines[1])
             _active_cells = []
-            _active_cells.extend(tuple(list(int(x) for x in line.split())) for line in lines[2:])
+            # we add one to the coordinate because we will add a padding of one cell to each side of the universe
+            _active_cells.extend(tuple(list(int(x)+1 for x in line.split())) for line in lines[2:]) 
             universe = create_universe(_width, _height, _active_cells)
         else:
             print(".in file not found. Please check file name.")
@@ -199,9 +403,9 @@ def one_generation_button_click() -> None:
     global canvas
     
     universe.update_universe()
+    generation += 1
     plot_universe(universe, padding)
     canvas.draw()
-    generation = generation + 1
     text.delete("1.0", "2.0")
     text.insert("1.0", f"Generation {generation} of {_generations}")
     window.update()
@@ -209,7 +413,7 @@ def one_generation_button_click() -> None:
 def all_generations_button_click():
     global all_gen_loop 
     all_gen_loop = True
-    for gen in range(generation, _generations - 1):
+    for gen in range(generation, _generations):
         if not all_gen_loop: break
         one_generation_button_click()
         time.sleep(.1)
