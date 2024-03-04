@@ -401,25 +401,34 @@ def one_generation_button_click() -> None:
     # TK widgets
     global text
     global canvas
-    
-    universe.update_universe()
-    generation += 1
-    plot_universe(universe, padding)
-    canvas.draw()
-    text.delete("1.0", "2.0")
-    text.insert("1.0", f"Generation {generation} of {_generations}")
-    window.update()
+        
+    if generation <= _generations:
+        universe.update_universe()
+        generation += 1
+        if generation == _generations: 
+            button_one_gen.configure(state="disabled")  
+        plot_universe(universe, padding)
+        canvas.draw()
+        text.delete("1.0", "2.0")
+        text.insert("1.0", f"Generation {generation} of {_generations}")
+        window.update()
 
 def all_generations_button_click():
     global all_gen_loop 
     all_gen_loop = True
+    button_stop.configure(state="normal")
+    button_all_gens.configure(state="disabled")
+    button_one_gen.configure(state="disabled")
     for gen in range(generation, _generations):
         if not all_gen_loop: break
         one_generation_button_click()
         time.sleep(.1)
+    button_stop.configure(state="disabled")
 
 def stop_button_click():
     global all_gen_loop
+    button_all_gens.configure(state="normal")
+    button_one_gen.configure(state="normal")
     all_gen_loop = False
     if all_gen_loop:
         loop_thread = threading.Thread(target=all_generations_button_click)
@@ -430,6 +439,7 @@ all_gen_loop = False
 button_one_gen = tk.Button(window, text=f"Run NEXT Generation", command=one_generation_button_click)
 button_all_gens = tk.Button(window, text=f"Run ALL Generations", command=all_generations_button_click)
 button_stop = tk.Button(window, text=f"STOP All Gen Loop", command=stop_button_click)
+button_stop.configure(state="disabled")
 text.config(height=1)
 text.pack()
 canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
