@@ -513,7 +513,7 @@ window = tk.Tk()
 text = tk.Text(window)
 text.insert("1.0", f"Generation {generation} of {_generations}")
 
-padding = 15     # the distance between the border cell and the visible plot ----------------------------------------------------------------
+padding = 7     # the distance between the border cell and the visible plot ----------------------------------------------------------------
 
 plot_universe(universe, padding)
 canvas = FigureCanvasTkAgg(fig, window)
@@ -551,7 +551,7 @@ def all_generations_button_click():
     for gen in range(generation, _generations):
         if not all_gen_loop: break
         one_generation_button_click()
-        time.sleep(.1)
+        time.sleep(.005)
     button_stop.configure(state="disabled")
 
 def stop_button_click():
